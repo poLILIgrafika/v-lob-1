@@ -283,86 +283,115 @@ function FormContent() {
         </span>
       </div>
 
-      {/* Email input */}
-      <div style={{ marginBottom: 10 }}>
-        <div
-          className="flex items-center px-[18px]"
-          style={{
-            background: "#1a1a1a",
-            borderRadius: 14,
-            height: 54,
-            border: "1.076px solid rgba(255,255,255,0.1)",
-          }}
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Ваш E-mail"
-            className="bg-transparent w-full outline-none"
-            style={{
-              fontFamily: "'Manrope', sans-serif",
-              fontWeight: 400,
-              fontSize: 15,
-              color: "#fff",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Phone input */}
-      <div style={{ marginBottom: 20 }}>
-        <div
-          className="flex items-center px-[18px]"
-          style={{
-            background: "#1a1a1a",
-            borderRadius: 14,
-            height: 54,
-            border: "1.076px solid rgba(255,255,255,0.1)",
-          }}
-        >
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Ваш телефон"
-            className="bg-transparent w-full outline-none"
-            style={{
-              fontFamily: "'Manrope', sans-serif",
-              fontWeight: 400,
-              fontSize: 15,
-              color: "#fff",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Submit button */}
-      <button
-        onClick={handleSubmit}
-        className="flex items-center justify-center relative overflow-hidden rounded-[16px] shadow-[0px_10px_36px_0px_rgba(255,85,0,0.55)] w-full"
-        style={{
-          height: 53,
-          background: "linear-gradient(171.462deg, rgb(255,85,0) 0%, rgb(255,140,0) 100%)",
-          border: "none",
-          cursor: "pointer",
-          marginBottom: 20,
+      {/* Form Content Wrapper */}
+      <form
+        className="mSoft-integration"
+        acceptCharset="utf-8"
+        method="post"
+        onSubmit={(e) => {
+          if (!email || !phone) {
+            e.preventDefault();
+            return;
+          }
+          handleSubmit();
         }}
       >
-        <span
+        <input type="hidden" name="payment" value="wayforpay" />
+        <input type="hidden" name="currency" value="UAH" />
+        <input type="hidden" name="amount" value="390" />
+        <input type="hidden" name="product_pay" value="5-ти денний марафон" />
+        <input type="hidden" name="reqId" value="online_ed_fun" />
+        <input type="hidden" name="stage" value="8" />
+        <input type="hidden" name="deal_name" value="DS_3.0_LILIA_TEST_390UA" />
+        <input type="hidden" name="up_stage" value="12" />
+        <input type="hidden" name="product" value="5-ти денний марафон" />
+        <input type="hidden" name="redirectUrl" value="https://directsell.site/vlob3_0/v4/thanks.php" />
+
+        {/* Email input */}
+        <div style={{ marginBottom: 10 }}>
+          <div
+            className="flex items-center px-[18px]"
+            style={{
+              background: "#1a1a1a",
+              borderRadius: 14,
+              height: 54,
+              border: "1.076px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            <input
+              type="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Ваш E-mail"
+              className="bg-transparent w-full outline-none"
+              style={{
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 400,
+                fontSize: 15,
+                color: "#fff",
+              }}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Phone input */}
+        <div style={{ marginBottom: 20 }}>
+          <div
+            className="flex items-center px-[18px]"
+            style={{
+              background: "#1a1a1a",
+              borderRadius: 14,
+              height: 54,
+              border: "1.076px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            <input
+              type="tel"
+              name="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Ваш телефон"
+              className="bg-transparent w-full outline-none"
+              style={{
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 400,
+                fontSize: 15,
+                color: "#fff",
+              }}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Submit button */}
+        <button
+          type="submit"
+          className="flex items-center justify-center relative overflow-hidden rounded-[16px] shadow-[0px_10px_36px_0px_rgba(255,85,0,0.55)] w-full"
           style={{
-            fontFamily: "'Unbounded', sans-serif",
-            fontWeight: 700,
-            fontSize: 14,
-            color: "#fff",
-            letterSpacing: "0.5px",
-            marginRight: 10,
+            height: 53,
+            background: "linear-gradient(171.462deg, rgb(255,85,0) 0%, rgb(255,140,0) 100%)",
+            border: "none",
+            cursor: "pointer",
+            marginBottom: 20,
           }}
         >
-          ОТРИМАТИ ДОСТУП
-        </span>
-        <ArrowRightIcon />
-      </button>
+          <span
+            style={{
+              fontFamily: "'Unbounded', sans-serif",
+              fontWeight: 700,
+              fontSize: 14,
+              color: "#fff",
+              letterSpacing: "0.5px",
+              marginRight: 10,
+            }}
+          >
+            ОТРИМАТИ ДОСТУП
+          </span>
+          <ArrowRightIcon />
+        </button>
+      </form>
 
       {/* Guarantee */}
       <div
