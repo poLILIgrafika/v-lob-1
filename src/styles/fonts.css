@@ -1,129 +1,114 @@
 /* =========================================================
    Font aliases — maps Figma-generated font identifiers
-   to their actual Google Fonts equivalents.
-   Used by Tailwind arbitrary values like font-['Unbounded:Bold']
+   to actual Google Fonts, loaded via URL (works on all devices)
    ========================================================= */
 
-@font-face {
-  font-family: 'Unbounded:Thin';
-  src: local('Unbounded Thin'), local('Unbounded-Thin');
-  font-weight: 100;
-}
-
-@font-face {
-  font-family: 'Unbounded:ExtraLight';
-  src: local('Unbounded ExtraLight'), local('Unbounded-ExtraLight');
-  font-weight: 200;
-}
-
-@font-face {
-  font-family: 'Unbounded:Light';
-  src: local('Unbounded Light'), local('Unbounded-Light');
-  font-weight: 300;
-}
-
-@font-face {
-  font-family: 'Unbounded:Regular';
-  src: local('Unbounded Regular'), local('Unbounded-Regular');
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: 'Unbounded:Medium';
-  src: local('Unbounded Medium'), local('Unbounded-Medium');
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: 'Unbounded:SemiBold';
-  src: local('Unbounded SemiBold'), local('Unbounded-SemiBold');
-  font-weight: 600;
-}
-
-@font-face {
-  font-family: 'Unbounded:Bold';
-  src: local('Unbounded Bold'), local('Unbounded-Bold');
-  font-weight: 700;
-}
-
-@font-face {
-  font-family: 'Unbounded:ExtraBold';
-  src: local('Unbounded ExtraBold'), local('Unbounded-ExtraBold');
-  font-weight: 800;
-}
-
-@font-face {
-  font-family: 'Unbounded:Black';
-  src: local('Unbounded Black'), local('Unbounded-Black');
-  font-weight: 900;
-}
-
-/* ── Manrope ─────────────────────────────────────────────── */
-
-@font-face {
-  font-family: 'Manrope:ExtraLight';
-  src: local('Manrope ExtraLight'), local('Manrope-ExtraLight');
-  font-weight: 200;
-}
-
-@font-face {
-  font-family: 'Manrope:Light';
-  src: local('Manrope Light'), local('Manrope-Light');
-  font-weight: 300;
-}
-
+/* ── Manrope:Regular (400) ───────────────────────────────── */
 @font-face {
   font-family: 'Manrope:Regular';
-  src: local('Manrope Regular'), local('Manrope-Regular');
+  font-style: normal;
   font-weight: 400;
+  font-display: swap;
+  src: local('Manrope Regular'),
+       url(https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk79FO_F.ttf) format('truetype');
 }
 
+/* ── Manrope:Medium (500) ────────────────────────────────── */
 @font-face {
   font-family: 'Manrope:Medium';
-  src: local('Manrope Medium'), local('Manrope-Medium');
+  font-style: normal;
   font-weight: 500;
+  font-display: swap;
+  src: local('Manrope Medium'),
+       url(https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk7PFO_F.ttf) format('truetype');
 }
 
+/* ── Manrope:SemiBold (600) ──────────────────────────────── */
 @font-face {
   font-family: 'Manrope:SemiBold';
-  src: local('Manrope SemiBold'), local('Manrope-SemiBold');
+  font-style: normal;
   font-weight: 600;
+  font-display: swap;
+  src: local('Manrope SemiBold'),
+       url(https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk4jE-_F.ttf) format('truetype');
 }
 
+/* ── Manrope:Bold (700) ──────────────────────────────────── */
 @font-face {
   font-family: 'Manrope:Bold';
-  src: local('Manrope Bold'), local('Manrope-Bold');
+  font-style: normal;
   font-weight: 700;
+  font-display: swap;
+  src: local('Manrope Bold'),
+       url(https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk4aE-_F.ttf) format('truetype');
 }
 
+/* ── Manrope:ExtraBold (800) ─────────────────────────────── */
 @font-face {
   font-family: 'Manrope:ExtraBold';
-  src: local('Manrope ExtraBold'), local('Manrope-ExtraBold');
+  font-style: normal;
   font-weight: 800;
+  font-display: swap;
+  src: local('Manrope ExtraBold'),
+       url(https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk59E-_F.ttf) format('truetype');
 }
 
-/* ── Inter ───────────────────────────────────────────────── */
-
+/* ── Unbounded:Regular (400) ─────────────────────────────── */
 @font-face {
-  font-family: 'Inter:Regular';
-  src: local('Inter Regular'), local('Inter-Regular');
+  font-family: 'Unbounded:Regular';
+  font-style: normal;
   font-weight: 400;
+  font-display: swap;
+  src: local('Unbounded Regular'),
+       url(https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG6xjx040.ttf) format('truetype');
 }
 
+/* ── Unbounded:Medium (500) ──────────────────────────────── */
 @font-face {
-  font-family: 'Inter:Medium';
-  src: local('Inter Medium'), local('Inter-Medium');
+  font-family: 'Unbounded:Medium';
+  font-style: normal;
   font-weight: 500;
+  font-display: swap;
+  src: local('Unbounded Medium'),
+       url(https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG6yrx040.ttf) format('truetype');
 }
 
+/* ── Unbounded:SemiBold (600) ────────────────────────────── */
 @font-face {
-  font-family: 'Inter:SemiBold';
-  src: local('Inter SemiBold'), local('Inter-SemiBold');
+  font-family: 'Unbounded:SemiBold';
+  font-style: normal;
   font-weight: 600;
+  font-display: swap;
+  src: local('Unbounded SemiBold'),
+       url(https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG68b2040.ttf) format('truetype');
 }
 
+/* ── Unbounded:Bold (700) ────────────────────────────────── */
 @font-face {
-  font-family: 'Inter:Bold';
-  src: local('Inter Bold'), local('Inter-Bold');
+  font-family: 'Unbounded:Bold';
+  font-style: normal;
   font-weight: 700;
+  font-display: swap;
+  src: local('Unbounded Bold'),
+       url(https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG6__2040.ttf) format('truetype');
+}
+
+/* ── Unbounded:ExtraBold (800) ───────────────────────────── */
+@font-face {
+  font-family: 'Unbounded:ExtraBold';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: local('Unbounded ExtraBold'),
+       url(https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG65j2040.ttf) format('truetype');
+}
+
+/* ── Unbounded:Black (900) ───────────────────────────────── */
+@font-face {
+  font-family: 'Unbounded:Black';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: local('Unbounded Black'),
+       url(https://fonts.gstatic.com/s/unbounded/v12/Yq6F-LOTXCb04q32xlpat-6uR42XTqtG67H2040.ttf) format('truetype');
 }
