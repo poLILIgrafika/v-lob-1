@@ -230,7 +230,7 @@ function FormContent() {
             color: "#ff5500",
           }}
         >
-          2 грн
+          390 грн
         </span>
       </div>
 
