@@ -285,15 +285,17 @@ function FormContent() {
 
       {/* Form Content Wrapper */}
       <form
+        action="https://secure.wayforpay.com/pay"
         className="mSoft-integration"
         acceptCharset="utf-8"
         method="post"
         onSubmit={(e) => {
           if (!email || !phone) {
             e.preventDefault();
+            alert("Будь ласка, заповніть усі поля");
             return;
           }
-          handleSubmit();
+          // No e.preventDefault() here means the browser will proceed with the POST to Wayforpay
         }}
       >
         <input type="hidden" name="payment" value="wayforpay" />
