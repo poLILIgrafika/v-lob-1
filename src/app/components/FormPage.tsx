@@ -246,6 +246,29 @@ function FormContent() {
 
           setIsSubmitting(true);
           try {
+            // 1. Спочатку відправляємо дані у вашу CRM (як це було на старому лендінгу)
+            const crmFormData = new URLSearchParams();
+            crmFormData.append("email", email);
+            crmFormData.append("phone", phone);
+            crmFormData.append("payment", "wayforpay");
+            crmFormData.append("currency", "UAH");
+            crmFormData.append("amount", "390"); // Стара ціна для CRM
+            crmFormData.append("product_pay", "5-ти денний марафон");
+            crmFormData.append("reqId", "online_ed_fun");
+            crmFormData.append("stage", "8");
+            crmFormData.append("deal_name", "DS_3.0_INSTA_390UA");
+            crmFormData.append("up_stage", "12");
+            crmFormData.append("product", "5-ти денний марафон");
+            crmFormData.append("redirectUrl", "https://directsell.site/vlob3_0/v4/thanks.php");
+
+            // Робимо фоновий запит (no-cors щоб уникнути помилок блокування браузером)
+            await fetch("https://directsell.site/vlob3_0/v4/thanks.php", {
+              method: "POST",
+              body: crmFormData,
+              mode: "no-cors"
+            }).catch(e => console.error("CRM sync error:", e));
+
+            // 2. Тепер формуємо платіж WayForPay
             const orderRef = makeOrderRef();
             const orderDate = Math.floor(Date.now() / 1000);
             
