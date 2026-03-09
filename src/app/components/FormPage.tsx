@@ -2,6 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import svgPaths from "../../imports/svg-51s9xntxol";
 
+// ── WayforPay config ──────────────────────────────────────────────────────────
+const WFP_MERCHANT = "online_ed_fun";
+const WFP_DOMAIN   = window.location.hostname || "localhost";
+const WFP_AMOUNT   = "3";
+const WFP_CURRENCY = "UAH";
+const WFP_PRODUCT  = "5-ти денний марафон";
+
+function makeOrderRef(): string {
+  return "order_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+}
+
 // ── helpers ────────────────────────────────────────────────────────────────
 
 function getTomorrowDate(): string {
@@ -136,7 +147,7 @@ function FormContent() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const tomorrow = getTomorrowDate();
   const [deadline] = useState(() => getMidnightDeadline());
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline));
@@ -145,11 +156,6 @@ function FormContent() {
     const id = setInterval(() => setTimeLeft(getTimeLeft(deadline)), 1000);
     return () => clearInterval(id);
   }, [deadline]);
-
-  const handleSubmit = () => {
-    if (!email || !phone) return;
-    setSubmitted(true);
-  };
 
   // ── divider with date ─────────────────────────────────────────────────────
   const Divider = () => (
@@ -172,61 +178,6 @@ function FormContent() {
       <div style={{ flex: 1, height: "1px", background: "linear-gradient(to left, transparent, rgba(255,85,0,0.18))" }} />
     </div>
   );
-
-  if (submitted) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-6 py-16 px-6 text-center">
-        {/* Rocket icon */}
-        <div
-          className="flex items-center justify-center rounded-[15px] shadow-[0px_0px_32px_0px_rgba(255,85,0,0.5)]"
-          style={{
-            width: 52,
-            height: 52,
-            background: "linear-gradient(135deg, rgb(255,85,0) 0%, rgb(255,140,0) 100%)",
-          }}
-        >
-          <RocketIcon />
-        </div>
-        <p
-          style={{
-            fontFamily: "'Manrope', sans-serif",
-            fontWeight: 700,
-            fontSize: 20,
-            color: "#fff",
-            lineHeight: "1.4",
-          }}
-        >
-          Дякуємо! 🎉
-        </p>
-        <p
-          style={{
-            fontFamily: "'Manrope', sans-serif",
-            fontWeight: 400,
-            fontSize: 15,
-            color: "#8c8c8c",
-            lineHeight: "1.5",
-          }}
-        >
-          Ваша заявка прийнята. Менеджер зв'яжеться з вами найближчим часом.
-        </p>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            fontFamily: "'Manrope', sans-serif",
-            fontWeight: 600,
-            fontSize: 14,
-            color: "#ff5500",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "8px 0",
-          }}
-        >
-          ← Повернутись на головну
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-0 w-full px-[20px]" style={{ paddingTop: 32 }}>
@@ -279,35 +230,84 @@ function FormContent() {
             color: "#ff5500",
           }}
         >
-          390 грн
+          3 грн
         </span>
       </div>
 
       {/* Form Content Wrapper */}
       <form
-        action="https://secure.wayforpay.com/pay"
         className="mSoft-integration"
-        acceptCharset="utf-8"
-        method="post"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
+          e.preventDefault();
           if (!email || !phone) {
-            e.preventDefault();
             alert("Будь ласка, заповніть усі поля");
             return;
           }
-          // No e.preventDefault() here means the browser will proceed with the POST to Wayforpay
+
+          setIsSubmitting(true);
+          try {
+            const orderRef = makeOrderRef();
+            const orderDate = Math.floor(Date.now() / 1000);
+            
+            // Запит до серверної функції (Vercel) для отримання підпису
+            const res = await fetch("/api/wayforpay-signature", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                merchantAccount: WFP_MERCHANT,
+                merchantDomainName: WFP_DOMAIN,
+                orderReference: orderRef,
+                orderDate: orderDate,
+                amount: WFP_AMOUNT,
+                currency: WFP_CURRENCY,
+                productName: WFP_PRODUCT,
+                productCount: "1",
+                productPrice: WFP_AMOUNT,
+              }),
+            });
+
+            if (!res.ok) throw new Error("Помилка генерації підпису");
+            
+            const data = await res.json();
+            
+            // Динамічно створюємо форму і відправляємо на WayforPay
+            const wfpForm = document.createElement("form");
+            wfpForm.method = "POST";
+            wfpForm.action = "https://secure.wayforpay.com/pay";
+            wfpForm.acceptCharset = "utf-8";
+
+            const appendInput = (name: string, value: string) => {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = name;
+              input.value = value;
+              wfpForm.appendChild(input);
+            };
+
+            appendInput("merchantAccount", WFP_MERCHANT);
+            appendInput("merchantDomainName", WFP_DOMAIN);
+            appendInput("orderReference", orderRef);
+            appendInput("orderDate", String(orderDate));
+            appendInput("amount", WFP_AMOUNT);
+            appendInput("currency", WFP_CURRENCY);
+            appendInput("productName[]", WFP_PRODUCT);
+            appendInput("productPrice[]", WFP_AMOUNT);
+            appendInput("productCount[]", "1");
+            appendInput("merchantSignature", data.signature);
+            appendInput("language", "UA");
+            appendInput("returnUrl", `${window.location.origin}/t3nx-8291`);
+            appendInput("serviceUrl", `${window.location.origin}/t3nx-8291`);
+
+            document.body.appendChild(wfpForm);
+            wfpForm.submit();
+
+          } catch (err) {
+            console.error(err);
+            alert("Сталася помилка при підготовці платежу. Спробуйте пізніше.");
+            setIsSubmitting(false);
+          }
         }}
       >
-        <input type="hidden" name="payment" value="wayforpay" />
-        <input type="hidden" name="currency" value="UAH" />
-        <input type="hidden" name="amount" value="390" />
-        <input type="hidden" name="product_pay" value="5-ти денний марафон" />
-        <input type="hidden" name="reqId" value="online_ed_fun" />
-        <input type="hidden" name="stage" value="8" />
-        <input type="hidden" name="deal_name" value="DS_3.0_LILIA_TEST_390UA" />
-        <input type="hidden" name="up_stage" value="12" />
-        <input type="hidden" name="product" value="5-ти денний марафон" />
-        <input type="hidden" name="redirectUrl" value="https://directsell.site/vlob3_0/v4/thanks.php" />
 
         {/* Email input */}
         <div style={{ marginBottom: 10 }}>
@@ -370,12 +370,14 @@ function FormContent() {
         {/* Submit button */}
         <button
           type="submit"
+          disabled={isSubmitting}
           className="flex items-center justify-center relative overflow-hidden rounded-[16px] shadow-[0px_10px_36px_0px_rgba(255,85,0,0.55)] w-full"
           style={{
             height: 53,
             background: "linear-gradient(171.462deg, rgb(255,85,0) 0%, rgb(255,140,0) 100%)",
             border: "none",
-            cursor: "pointer",
+            cursor: isSubmitting ? "not-allowed" : "pointer",
+            opacity: isSubmitting ? 0.7 : 1,
             marginBottom: 20,
           }}
         >
@@ -389,7 +391,7 @@ function FormContent() {
               marginRight: 10,
             }}
           >
-            ОТРИМАТИ ДОСТУП
+            {isSubmitting ? "ОБРОБКА..." : "ОТРИМАТИ ДОСТУП"}
           </span>
           <ArrowRightIcon />
         </button>
@@ -594,36 +596,6 @@ export default function FormPage() {
               zIndex: 0,
             }}
           />
-
-          {/* Back button */}
-          <button
-            onClick={() => navigate("/")}
-            className="absolute flex items-center gap-[8px]"
-            style={{
-              top: 16,
-              left: 16,
-              background: "rgba(255,255,255,0.06)",
-              border: "1.076px solid rgba(255,85,0,0.18)",
-              borderRadius: 12,
-              height: 37,
-              padding: "0 14px 0 10px",
-              cursor: "pointer",
-              zIndex: 10,
-            }}
-          >
-            <ArrowLeftIcon />
-            <span
-              style={{
-                fontFamily: "'Manrope', sans-serif",
-                fontWeight: 500,
-                fontSize: 13,
-                color: "#999",
-                lineHeight: "19.5px",
-              }}
-            >
-              Назад
-            </span>
-          </button>
 
           {/* Form content */}
           <div style={{ position: "relative", zIndex: 1 }}>
