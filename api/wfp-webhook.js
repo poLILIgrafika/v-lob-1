@@ -84,6 +84,7 @@ export default async function handler(req, res) {
         const updateDealUrl = `https://api.pipedrive.com/v1/deals/${dealId}?api_token=${PIPEDRIVE_API_TOKEN}`;
         const updatePayload = {
             status: 'won',
+            stage_id: 12, // Переміщуємо в колонку "Оплачено"
             value: wfpData.amount
         };
 

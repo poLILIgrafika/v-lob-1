@@ -324,8 +324,6 @@ function FormContent() {
             appendInput("language", "UA");
             appendInput("clientEmail", email);
             appendInput("clientPhone", phone);
-            appendInput("clientFirstName", name);
-            appendInput("clientLastName", name); // Якщо немає окремого прізвища, дублюємо ім'я
             appendInput("returnUrl", "https://" + window.location.host + "/api/wfp-return");
             // Змінюємо serviceUrl на наш новий ендпоінт
             appendInput("serviceUrl", "https://" + window.location.host + "/api/wfp-webhook");
