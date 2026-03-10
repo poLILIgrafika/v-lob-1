@@ -259,7 +259,6 @@ function FormContent() {
               payment: "wayforpay",
               currency: "UAH",
               amount: "390",
-              redirectUrl: "https://v-lob-1.vercel.app/t3nx-8291",
               utm_source: getUtm("utm_source"),
               utm_medium: getUtm("utm_medium"),
               utm_campaign: getUtm("utm_campaign"),
@@ -323,7 +322,7 @@ function FormContent() {
             appendInput("productCount[]", "1");
             appendInput("merchantSignature", data.signature);
             appendInput("language", "UA");
-            appendInput("returnUrl", "https://v-lob-1.vercel.app/t3nx-8291");
+            appendInput("returnUrl", "https://directsell.site/vlob3_0/v4/thanks.php");
             // Змінюємо serviceUrl на наш новий ендпоінт
             appendInput("serviceUrl", "https://" + window.location.host + "/api/wfp-webhook");
 
