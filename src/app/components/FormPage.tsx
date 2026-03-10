@@ -324,7 +324,8 @@ function FormContent() {
             appendInput("merchantSignature", data.signature);
             appendInput("language", "UA");
             appendInput("returnUrl", "https://directsell.site/vlob3_0/v4/thanks.php");
-            appendInput("serviceUrl", "https://directsell.site/vlob3_0/v4/thanks.php");
+            // Змінюємо serviceUrl на наш новий ендпоінт
+            appendInput("serviceUrl", "https://" + window.location.host + "/api/wfp-webhook");
 
             document.body.appendChild(wfpForm);
             wfpForm.submit();
