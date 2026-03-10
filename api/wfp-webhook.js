@@ -1,40 +1,52 @@
 // api/wfp-webhook.js
 export default async function handler(req, res) {
-    // Тільки POST-запити від WayForPay
+    console.log('--- WFP Webhook Received ---');
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     try {
-        const wfpData = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        let wfpData = req.body;
+        if (typeof wfpData === 'string') {
+            try {
+                wfpData = JSON.parse(wfpData);
+            } catch (e) {
+                console.log('Body is not JSON, treating as raw string or form data');
+            }
+        }
+
+        console.log('WFP Body:', JSON.stringify(wfpData, null, 2));
 
         // Перевіряємо статус платежу
         if (wfpData.transactionStatus !== 'Approved') {
+            console.log('Payment NOT Approved. Status:', wfpData.transactionStatus);
             return res.status(200).json({ status: 'Ignored', reason: 'Not Approved' });
         }
 
-        const customerEmail = wfpData.email;
-        const customerPhone = wfpData.phone;
+        const customerEmail = wfpData.email || wfpData.clientEmail;
+        const customerPhone = wfpData.phone || wfpData.clientPhone;
+
+        console.log(`Customer info: Email: ${customerEmail}, Phone: ${customerPhone}`);
 
         if (!customerEmail && !customerPhone) {
+            console.log('Error: No email or phone found in WFP response');
             return res.status(200).json({ status: 'Ignored', reason: 'No email or phone' });
         }
 
-        // ── Ваш ключ Pipedrive (потрібно додати в Vercel Environment Variables як PIPEDRIVE_API_TOKEN) ──
         const PIPEDRIVE_API_TOKEN = process.env.PIPEDRIVE_API_TOKEN;
-        // ── ID етапу "Оплачено" в вашій воронці Pipedrive (замініть на реальний ID) ──
-        const PIPEDRIVE_SUCCESS_STAGE_ID = 12; // приклад: 12
-
         if (!PIPEDRIVE_API_TOKEN) {
-            console.error('Missing PIPEDRIVE_API_TOKEN in environments');
+            console.error('CRITICAL ERROR: Missing PIPEDRIVE_API_TOKEN in Vercel settings');
             return res.status(500).json({ error: 'Server misconfiguration' });
         }
 
-        // 1. Шукаємо людину (Person) в Pipedrive за email або телефоном
+        // 1. Шукаємо людину (Person) в Pipedrive
         const searchTerm = customerEmail || customerPhone;
-        const searchUrl = `https://api.pipedrive.com/v1/persons/search?term=${encodeURIComponent(searchTerm)}&api_token=${PIPEDRIVE_API_TOKEN}`;
+        console.log(`Searching Pipedrive for: ${searchTerm}`);
 
-        const searchResult = await fetch(searchUrl).then(r => r.json());
+        const searchUrl = `https://api.pipedrive.com/v1/persons/search?term=${encodeURIComponent(searchTerm)}&api_token=${PIPEDRIVE_API_TOKEN}`;
+        const searchResponse = await fetch(searchUrl);
+        const searchResult = await searchResponse.json();
 
         if (!searchResult.success || !searchResult.data.items || searchResult.data.items.length === 0) {
             console.log('Person not found in Pipedrive for term:', searchTerm);
@@ -42,48 +54,52 @@ export default async function handler(req, res) {
         }
 
         const personId = searchResult.data.items[0].item.id;
+        console.log(`Found Person ID: ${personId}`);
 
-        // 2. Шукаємо відкриту угоду (Deal) прив'язану до цієї людини
+        // 2. Шукаємо відкриту угоду (Deal)
         const dealsUrl = `https://api.pipedrive.com/v1/persons/${personId}/deals?status=open&api_token=${PIPEDRIVE_API_TOKEN}`;
-        const dealsResult = await fetch(dealsUrl).then(r => r.json());
+        const dealsResponse = await fetch(dealsUrl);
+        const dealsResult = await dealsResponse.json();
 
         if (!dealsResult.success || !dealsResult.data || dealsResult.data.length === 0) {
-            console.log('No open deals found for person ID:', personId);
+            console.log(`No open deals found for person ID: ${personId}`);
             return res.status(200).json({ status: 'Ignored', reason: 'No open deals found' });
         }
 
-        // Беремо першу відкриту угоду
+        // Беремо останню відкриту угоду (вона зазвичай перша в списку)
         const dealId = dealsResult.data[0].id;
+        console.log(`Found Deal ID: ${dealId}. Attempting to update to 'won'...`);
 
-        // 3. Оновлюємо статус угоди (змінюємо статус на "виграно")
+        // 3. Оновлюємо статус угоди на "Виграно"
         const updateDealUrl = `https://api.pipedrive.com/v1/deals/${dealId}?api_token=${PIPEDRIVE_API_TOKEN}`;
         const updatePayload = {
-            status: 'won', // або 'open', якщо угода ще не закривається
-            value: wfpData.amount // опціонально: оновлюємо суму угоди
+            status: 'won',
+            value: wfpData.amount
         };
 
         const updateResponse = await fetch(updateDealUrl, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatePayload)
-        }).then(r => r.json());
+        });
+        const updateResult = await updateResponse.json();
 
-        if (!updateResponse.success) {
-            console.error('Failed to update deal in Pipedrive', updateResponse);
+        if (!updateResult.success) {
+            console.error('Failed to update deal in Pipedrive:', updateResult);
         } else {
-            console.log(`Successfully updated Deal #${dealId} to stage ${PIPEDRIVE_SUCCESS_STAGE_ID}`);
+            console.log(`SUCCESS: Deal #${dealId} updated to 'won' status!`);
         }
 
-        // Відповідь для WayForPay (обов'язкова структура)
+        // Відповідь для WayForPay
         const time = Math.floor(Date.now() / 1000);
         return res.status(200).json({
-            orderReference: wfpData.orderReference,
+            orderReference: wfpData.orderReference || 'ref',
             status: "accept",
             time: time
         });
 
     } catch (error) {
-        console.error('Webhook error:', error);
+        console.error('FATAL Webhook error:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
