@@ -322,7 +322,7 @@ function FormContent() {
             appendInput("productCount[]", "1");
             appendInput("merchantSignature", data.signature);
             appendInput("language", "UA");
-            appendInput("returnUrl", "https://directsell.site/vlob3_0/v4/thanks.php");
+            appendInput("returnUrl", "https://v-lob-1.vercel.app/t3nx-8291");
             // Змінюємо serviceUrl на наш новий ендпоінт
             appendInput("serviceUrl", "https://" + window.location.host + "/api/wfp-webhook");
 
