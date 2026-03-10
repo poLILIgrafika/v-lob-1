@@ -8,15 +8,25 @@ export default async function handler(req, res) {
 
     try {
         let wfpData = req.body;
-        if (typeof wfpData === 'string') {
+
+        // WayForPay іноді відправляє дані у дивному форматі, де JSON-рядок є ключем об'єкта.
+        // Перевіряємо, чи є в нас такий випадок:
+        if (wfpData && typeof wfpData === 'object' && Object.keys(wfpData).length === 1 && Object.keys(wfpData)[0].startsWith('{')) {
+            try {
+                console.log('Detected JSON-in-key format. Parsing...');
+                wfpData = JSON.parse(Object.keys(wfpData)[0]);
+            } catch (e) {
+                console.log('Failed to parse JSON key:', e.message);
+            }
+        } else if (typeof wfpData === 'string') {
             try {
                 wfpData = JSON.parse(wfpData);
             } catch (e) {
-                console.log('Body is not JSON, treating as raw string or form data');
+                console.log('Body is raw string, but not valid JSON');
             }
         }
 
-        console.log('WFP Body:', JSON.stringify(wfpData, null, 2));
+        console.log('Final Parsed WFP Body:', JSON.stringify(wfpData, null, 2));
 
         // Перевіряємо статус платежу
         if (wfpData.transactionStatus !== 'Approved') {
