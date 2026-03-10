@@ -55,10 +55,9 @@ export default async function handler(req, res) {
         // Беремо першу відкриту угоду
         const dealId = dealsResult.data[0].id;
 
-        // 3. Оновлюємо статус угоди (переміщуємо в етап "Оплачено")
+        // 3. Оновлюємо статус угоди (змінюємо статус на "виграно")
         const updateDealUrl = `https://api.pipedrive.com/v1/deals/${dealId}?api_token=${PIPEDRIVE_API_TOKEN}`;
         const updatePayload = {
-            stage_id: PIPEDRIVE_SUCCESS_STAGE_ID,
             status: 'won', // або 'open', якщо угода ще не закривається
             value: wfpData.amount // опціонально: оновлюємо суму угоди
         };
