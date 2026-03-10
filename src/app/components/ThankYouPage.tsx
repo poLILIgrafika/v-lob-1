@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
 import svgPaths from "../../imports/svg-51s9xntxol";
 
-// ── Bot link (replace with real link when ready) ──────────────────────────────
-const BOT_LINK = "#"; // 👈 Замінити на реальне посилання на бот
+// ── Bot link ──────────────────────────────────────────────────────────────────
+const BOT_LINK = "https://t.me/vlob_voskresensky_bot?start=KrZZw5UlqQA9l8jq";
 
 // ── SVG icons ─────────────────────────────────────────────────────────────────
 
