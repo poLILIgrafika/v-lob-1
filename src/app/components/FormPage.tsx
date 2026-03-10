@@ -246,25 +246,30 @@ function FormContent() {
 
           setIsSubmitting(true);
           try {
-            // 1. Спочатку відправляємо дані у вашу CRM (як це було на старому лендінгу)
-            const crmFormData = new URLSearchParams();
-            crmFormData.append("email", email);
-            crmFormData.append("phone", phone);
-            crmFormData.append("payment", "wayforpay");
-            crmFormData.append("currency", "UAH");
-            crmFormData.append("amount", "2"); // Стара ціна для CRM
-            crmFormData.append("product_pay", "5-ти денний марафон"); // Стара назва для CRM
-            crmFormData.append("reqId", "online_ed_fun");
-            crmFormData.append("stage", "8");
-            crmFormData.append("deal_name", "DS_3.0_LILI-TEST_390UA");
-            crmFormData.append("up_stage", "12");
-            crmFormData.append("product", "5-ти денний марафон"); // Стара назва для CRM
-            crmFormData.append("redirectUrl", "https://directsell.site/vlob3_0/v4/thanks.php");
+            // 1. Відправляємо дані у CRM (pipepanel)
+            const getUtm = (p: string) => new URLSearchParams(window.location.search).get(p) ?? "";
+            const crmPayload = JSON.stringify({
+              email,
+              phone,
+              reqId: "online_ed_fun",
+              stage: "8",
+              deal_name: "DS_3.0_LILI-TEST_390UA",
+              up_stage: "12",
+              product: "5-ти денний марафон",
+              payment: "wayforpay",
+              currency: "UAH",
+              amount: "390",
+              redirectUrl: "https://directsell.site/vlob3_0/v4/thanks.php",
+              utm_source: getUtm("utm_source"),
+              utm_medium: getUtm("utm_medium"),
+              utm_campaign: getUtm("utm_campaign"),
+              utm_content: getUtm("utm_content"),
+              utm_term: getUtm("utm_term"),
+            });
 
-            // Робимо фоновий запит (no-cors щоб уникнути помилок блокування браузером)
-            await fetch("https://directsell.site/vlob3_0/thanks.php", {
+            await fetch("https://scripts.voskresensky.com/pipepanel/forms.php?req=online_ed_fun", {
               method: "POST",
-              body: crmFormData,
+              body: crmPayload,
               mode: "no-cors"
             }).catch(e => console.error("CRM sync error:", e));
 
